@@ -5,6 +5,7 @@ import (
 	"go-wxbot/global"
 	"go-wxbot/logger"
 	"go-wxbot/protocol"
+	"io"
 
 	"github.com/eatmoreapple/openwechat"
 	"github.com/gin-gonic/gin"
@@ -87,6 +88,14 @@ func GetCurrentUserInfoHandle(ctx *gin.Context) {
 	}
 
 	logger.Log.Infof("登录用户：%v", user.NickName)
+	//下载头像
+	h := make([]byte, 2*1024*1024)
+	resp, err := user.GetAvatarResponse()
+	if err == nil {
+		h, _ = io.ReadAll(resp.Body)
+		defer resp.Body.Close()
+	}
+
 	userDataVO := responseUserInfo{
 		Uin:         user.Uin,
 		Sex:         user.Sex,
@@ -96,7 +105,7 @@ func GetCurrentUserInfoHandle(ctx *gin.Context) {
 		DisplayName: user.DisplayName,
 		NickName:    user.NickName,
 		RemarkName:  user.RemarkName,
-		HeadImgUrl:  user.HeadImgUrl,
+		HeadImgUrl:  string(h),
 		UserName:    user.UserName,
 	}
 	core.OkWithData(userDataVO, ctx)
