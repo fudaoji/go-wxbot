@@ -10,6 +10,7 @@ import (
 	"go-wxbot/logger"
 	"go-wxbot/middleware"
 
+	. "go-wxbot/install"
 	"go-wxbot/route"
 )
 
@@ -33,11 +34,10 @@ func main() {
 	//读取配置
 	core.InitConfig()
 
-	// 初始化OSS
-	//oss.InitOssConnHandle()
-
 	// 初始化MysqlDB
 	InitMysqlConnHandle()
+	// 安装数据表
+	InstallHandle()
 
 	// 初始化Redis连接
 	InitRedisConnHandle()
