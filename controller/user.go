@@ -47,10 +47,45 @@ type setRemarkNameRes struct {
 
 // 邀请好友入群请求体
 type addFriendsIntoGroupRes struct {
-	// 用户名
+	// 群username
 	Group string `form:"group" json:"group"`
-	// 正文
+	// 好友username数组
 	Friends []string `form:"friends" json:"friends"`
+}
+
+// 邀请好友入多群请求体
+type addFriendIntoGroupsRes struct {
+	// 好友username
+	Friend string `form:"group" json:"group"`
+	// 群组username数值
+	Groups []string `form:"friends" json:"friends"`
+}
+
+// AddFriendsIntoGroupHandle 邀请1个好友入多个群
+func AddFriendIntoGroupsHandle(ctx *gin.Context) {
+	// 取出请求参数
+	var res addFriendIntoGroupsRes
+	if err := ctx.ShouldBindJSON(&res); err != nil {
+		core.FailWithMessage("参数获取失败", ctx)
+		return
+	}
+
+	bot := GetCurBot(ctx)
+	friend, self := FindFriend(bot, res.Friend, ctx)
+	if friend == nil {
+		return
+	}
+
+	var groups = make(openwechat.Groups, 0)
+	for _, item := range res.Groups {
+		group, _ := FindGroup(bot, item, ctx)
+		if friend != nil {
+			groups = append(group, friend)
+		}
+	}
+
+	self.AddFriendIntoManyGroups(friend, groups...)
+	core.Ok(ctx)
 }
 
 // AddFriendsIntoGroupHandle 邀请好友入群
