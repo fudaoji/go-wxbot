@@ -80,7 +80,7 @@ func AddFriendIntoGroupsHandle(ctx *gin.Context) {
 	for _, item := range res.Groups {
 		group, _ := FindGroup(bot, item, ctx)
 		if friend != nil {
-			groups = append(group, friend)
+			groups = append(groups, group)
 		}
 	}
 
