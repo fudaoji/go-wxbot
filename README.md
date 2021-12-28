@@ -18,6 +18,7 @@ go build main.go
 # 清理无用mod引用
 go mod tidy
 ```
+无需手动安装数据表，随着程序的启动，系统会自动迁移数据表。
 ## 运行
 
 ```shell
