@@ -9,7 +9,8 @@ import (
 // initUserRoute 初始化登录路由信息
 func initUserRoute(app *gin.Engine) {
 	group := app.Group("/user")
-
+	// 邀请好友入群
+	group.POST("/addfriendsintogroup", controller.AddFriendsIntoGroupHandle)
 	// 获取登录的用户信息
 	group.GET("/info", controller.GetCurrentUserInfoHandle)
 	// 获取好友列表

@@ -5,7 +5,6 @@ import (
 	"go-wxbot/global"
 	"go-wxbot/logger"
 	"go-wxbot/protocol"
-	"io"
 
 	"github.com/eatmoreapple/openwechat"
 	"github.com/gin-gonic/gin"
@@ -44,6 +43,41 @@ type setRemarkNameRes struct {
 	To string `form:"to" json:"to"`
 	// 正文
 	RemarkName string `form:"remark_name" json:"remark_name"`
+}
+
+// 邀请好友入群请求体
+type addFriendsIntoGroupRes struct {
+	// 用户名
+	Group string `form:"group" json:"group"`
+	// 正文
+	Friends []string `form:"friends" json:"friends"`
+}
+
+// AddFriendsIntoGroupHandle 邀请好友入群
+func AddFriendsIntoGroupHandle(ctx *gin.Context) {
+	// 取出请求参数
+	var res addFriendsIntoGroupRes
+	if err := ctx.ShouldBindJSON(&res); err != nil {
+		core.FailWithMessage("参数获取失败", ctx)
+		return
+	}
+
+	bot := GetCurBot(ctx)
+	group, self := FindGroup(bot, res.Group, ctx)
+	if group == nil {
+		return
+	}
+
+	var friends = make(openwechat.Friends, 0)
+	for _, item := range res.Friends {
+		friend, _ := FindFriend(bot, item, ctx)
+		if friend != nil {
+			friends = append(friends, friend)
+		}
+	}
+
+	self.AddFriendsIntoGroup(group, friends...)
+	core.Ok(ctx)
 }
 
 // SetRemarkNameHandle 修改指定用户的备注
@@ -89,13 +123,6 @@ func GetCurrentUserInfoHandle(ctx *gin.Context) {
 
 	logger.Log.Infof("登录用户：%v", user.NickName)
 	//下载头像
-	h := make([]byte, 2*1024*1024)
-	resp, err := user.GetAvatarResponse()
-	if err == nil {
-		h, _ = io.ReadAll(resp.Body)
-		defer resp.Body.Close()
-	}
-
 	userDataVO := responseUserInfo{
 		Uin:         user.Uin,
 		Sex:         user.Sex,
@@ -105,7 +132,7 @@ func GetCurrentUserInfoHandle(ctx *gin.Context) {
 		DisplayName: user.DisplayName,
 		NickName:    user.NickName,
 		RemarkName:  user.RemarkName,
-		HeadImgUrl:  string(h),
+		HeadImgUrl:  user.HeadImgUrl,
 		UserName:    user.UserName,
 	}
 	core.OkWithData(userDataVO, ctx)
