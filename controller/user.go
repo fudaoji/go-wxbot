@@ -56,9 +56,9 @@ type addFriendsIntoGroupRes struct {
 // 邀请好友入多群请求体
 type addFriendIntoGroupsRes struct {
 	// 好友username
-	Friend string `form:"group" json:"group"`
+	Friend string `form:"friend" json:"friend"`
 	// 群组username数值
-	Groups []string `form:"friends" json:"friends"`
+	Groups []string `form:"groups" json:"groups"`
 }
 
 // AddFriendsIntoGroupHandle 邀请1个好友入多个群
