@@ -1,0 +1,9 @@
+.idea
+vendor
+logs
+.DS_Store
+tmp
+main
+go.sum
+setting_prod.yaml
+uploads
