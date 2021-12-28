@@ -1,4 +1,4 @@
-## WebWechat
+## Go-Wxbot
 
 基于`Golang`语言和`Gin`框架的个人微信机器人，以RESTful Api方式对外提供服务。
 
