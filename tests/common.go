@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	APPKEY  = "15659827559"
+	APPKEY  = "18659253156"
 	APIHOST = "http://127.0.0.1:8889"
 )
 
@@ -26,7 +26,7 @@ var (
 		"msgToGroup":          APIHOST + "/message/group",
 		"setfriendremarkname": APIHOST + "/user/setfriendremarkname",
 	}
-	Uuid = "of6clHXN0w=="
+	Uuid = "oYPULy2m1w=="
 )
 
 type Resp struct {

@@ -27,7 +27,7 @@ func TestImgToFriend(t *testing.T) {
 //发送消息给好友
 func TestTextToFriend(t *testing.T) {
 	method, url := "POST", Apis["msgToFriend"]
-	res := Request(method, url, sendMsg{To: "道集", Type: "text", Content: "hi"})
+	res := Request(method, url, sendMsg{To: "@86b5c76331d9a825c68ed9aff439cf9114bcaae01e0603c7700b1b59645ed290", Type: "text", Content: "test"})
 	fmt.Printf("%#v", res)
 }
 
