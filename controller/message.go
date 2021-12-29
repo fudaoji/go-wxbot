@@ -60,6 +60,46 @@ type sendFileBatchRes struct {
 	Filename string `form:"filename" json:"filename"`
 }
 
+// SendVideoBatchHandle 群发视频消息
+func SendVideoBatchHandle(ctx *gin.Context) {
+	// 取出请求参数
+	var res sendTextBatchRes
+	if err := ctx.ShouldBindJSON(&res); err != nil {
+		core.FailWithMessage("参数获取失败", ctx)
+		return
+	}
+
+	bot := GetCurBot(ctx)
+	self, _ := bot.GetCurrentUser()
+	filename := path.Base(res.Content)
+	destPath := fmt.Sprintf("%s%d/", core.GetVal("uploadpath", "./uploads/"), self.Uin)
+	file, err := utils.FetchFile(res.Content, destPath, filename)
+	if err != nil {
+		core.FailWithMessage("拉取视频失败"+err.Error(), ctx)
+		return
+	}
+	defer os.Remove(destPath + filename)
+	//好友
+	for _, item := range res.Friends {
+		friend, _ := FindFriend(bot, item, ctx)
+		if friend != nil {
+			friend.SendVideo(file)
+			time.Sleep(time.Duration(rand.Intn(3)) * time.Second)
+		}
+	}
+
+	//群聊
+	for _, item := range res.Groups {
+		group, _ := FindGroup(bot, item, ctx)
+		if group != nil {
+			group.SendVideo(file)
+			time.Sleep(time.Duration(rand.Intn(3)) * time.Second)
+		}
+	}
+
+	core.Ok(ctx)
+}
+
 // SendFileBatchHandle 群发文件消息
 func SendFileBatchHandle(ctx *gin.Context) {
 	// 取出请求参数
