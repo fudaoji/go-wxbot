@@ -102,6 +102,7 @@ func SendImgBatchHandle(ctx *gin.Context) {
 				delays = append(delays, delay)
 			}
 			if groups.Count() > 0 {
+				file.Seek(0, 0)
 				if err := groups.SendImage(file, delays...); err != nil {
 					core.FailWithMessage("群发群聊出错："+err.Error(), ctx)
 					return
