@@ -87,7 +87,7 @@ func SendVideoBatchHandle(ctx *gin.Context) {
 			time.Sleep(time.Duration(rand.Intn(3)) * time.Second)
 		}
 	}
-
+	file.Seek(0, 0)
 	//群聊
 	for _, item := range res.Groups {
 		group, _ := FindGroup(bot, item, ctx)
