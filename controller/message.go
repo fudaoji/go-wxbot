@@ -48,6 +48,70 @@ type sendTextBatchRes struct {
 	Content string `form:"content" json:"content"`
 }
 
+// SendImgBatchHandle 群发图片消息
+func SendImgBatchHandle(ctx *gin.Context) {
+	// 取出请求参数
+	var res sendTextBatchRes
+	if err := ctx.ShouldBindJSON(&res); err != nil {
+		core.FailWithMessage("参数获取失败", ctx)
+		return
+	}
+
+	bot := GetCurBot(ctx)
+	self, _ := bot.GetCurrentUser()
+	filename := path.Base(res.Content)
+	destPath := fmt.Sprintf("%s%d/", core.GetVal("uploadpath", "./uploads/"), self.Uin)
+	file, err := utils.FetchFile(res.Content, destPath, filename)
+	if err != nil {
+		core.FailWithMessage("拉取图片失败"+err.Error(), ctx)
+		return
+	}
+	defer os.Remove(destPath + filename)
+	//好友
+	if len(res.Friends) > 0 {
+		var friends = make(openwechat.Friends, 0)
+		var delays = []time.Duration{}
+		for _, item := range res.Friends {
+			friend, _ := FindFriend(bot, item, ctx)
+			var delay time.Duration
+			if friend != nil {
+				friends = append(friends, friend)
+				rand.Seed(time.Now().UnixNano())
+				delay = time.Duration((rand.Intn(3)+1)*1000) * time.Millisecond
+				delays = append(delays, delay)
+			}
+			if friends.Count() > 0 {
+				if err := friends.SendImage(file, delays...); err != nil {
+					core.FailWithMessage("群发好友出错："+err.Error(), ctx)
+					return
+				}
+			}
+		}
+	}
+	//群聊
+	if len(res.Groups) > 0 {
+		var groups = make(openwechat.Groups, 0)
+		var delays = []time.Duration{}
+		for _, item := range res.Groups {
+			group, _ := FindGroup(bot, item, ctx)
+			var delay time.Duration
+			if group != nil {
+				groups = append(groups, group)
+				rand.Seed(time.Now().UnixNano())
+				delay = time.Duration((rand.Intn(3)+1)*1000) * time.Millisecond
+				delays = append(delays, delay)
+			}
+			if groups.Count() > 0 {
+				if err := groups.SendImage(file, delays...); err != nil {
+					core.FailWithMessage("群发群聊出错："+err.Error(), ctx)
+					return
+				}
+			}
+		}
+	}
+	core.Ok(ctx)
+}
+
 // SendTextBatchHandle 群发文本消息
 func SendTextBatchHandle(ctx *gin.Context) {
 	// 取出请求参数
