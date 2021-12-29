@@ -72,6 +72,7 @@ func SendTextBatchHandle(ctx *gin.Context) {
 				delays = append(delays, delay)
 			}
 			if friends.Count() > 0 {
+				fmt.Println(1, delays)
 				friends.SendText(res.Content, delays...)
 			}
 		}
@@ -90,6 +91,7 @@ func SendTextBatchHandle(ctx *gin.Context) {
 				delays = append(delays, delay)
 			}
 			if groups.Count() > 0 {
+				fmt.Println(2, delays)
 				groups.SendText(res.Content, delays...)
 			}
 		}
