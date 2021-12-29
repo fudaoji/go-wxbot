@@ -72,8 +72,10 @@ func SendTextBatchHandle(ctx *gin.Context) {
 				delays = append(delays, delay)
 			}
 			if friends.Count() > 0 {
-				fmt.Println(1, delays)
-				friends.SendText(res.Content, delays...)
+				if err := friends.SendText(res.Content, delays...); err != nil {
+					core.FailWithMessage("群发好友出错："+err.Error(), ctx)
+					return
+				}
 			}
 		}
 	}
@@ -91,8 +93,10 @@ func SendTextBatchHandle(ctx *gin.Context) {
 				delays = append(delays, delay)
 			}
 			if groups.Count() > 0 {
-				fmt.Println(2, delays)
-				groups.SendText(res.Content, delays...)
+				if err := groups.SendText(res.Content, delays...); err != nil {
+					core.FailWithMessage("群发群聊出错："+err.Error(), ctx)
+					return
+				}
 			}
 		}
 	}
