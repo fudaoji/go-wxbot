@@ -84,19 +84,22 @@ func SendVideoBatchHandle(ctx *gin.Context) {
 		friend, _ := FindFriend(bot, item, ctx)
 		if friend != nil {
 			friend.SendVideo(file)
-			time.Sleep(time.Duration(rand.Intn(3)) * time.Second)
-		}
-	}
-	file.Seek(0, 0)
-	//群聊
-	for _, item := range res.Groups {
-		group, _ := FindGroup(bot, item, ctx)
-		if group != nil {
-			group.SendVideo(file)
+			file.Seek(0, 0)
 			time.Sleep(time.Duration(rand.Intn(3)) * time.Second)
 		}
 	}
 
+	//群聊
+	for i, item := range res.Groups {
+		group, _ := FindGroup(bot, item, ctx)
+		if group != nil {
+			group.SendVideo(file)
+			file.Seek(0, 0)
+			if i <= len(res.Groups)-2 {
+				time.Sleep(time.Duration(rand.Intn(3)) * time.Second)
+			}
+		}
+	}
 	core.Ok(ctx)
 }
 
@@ -147,7 +150,17 @@ func SendFileBatchHandle(ctx *gin.Context) {
 	}
 	//群聊
 	if len(res.Groups) > 0 {
-		var groups = make(openwechat.Groups, 0)
+		for i, item := range res.Groups {
+			group, _ := FindGroup(bot, item, ctx)
+			if group != nil {
+				group.SendFile(file)
+				file.Seek(0, 0)
+				if i < len(res.Groups)-1 {
+					time.Sleep(time.Duration(rand.Intn(3)) * time.Second)
+				}
+			}
+		}
+		/*var groups = make(openwechat.Groups, 0)
 		var delays = []time.Duration{}
 		for _, item := range res.Groups {
 			group, _ := FindGroup(bot, item, ctx)
@@ -159,13 +172,13 @@ func SendFileBatchHandle(ctx *gin.Context) {
 				delays = append(delays, delay)
 			}
 			if groups.Count() > 0 {
-				/* file.Seek(0, 0)
+				file.Seek(0, 0)
 				if err := groups.SendFile(file, delays...); err != nil {
 					core.FailWithMessage("群发群聊出错："+err.Error(), ctx)
 					return
-				} */ //源码漏了
+				} //源码漏了
 			}
-		}
+		}*/
 	}
 	core.Ok(ctx)
 }
