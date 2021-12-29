@@ -5,8 +5,10 @@ import (
 	"go-wxbot/core"
 	"go-wxbot/global"
 	"go-wxbot/protocol"
+	"math/rand"
 	"os"
 	"path"
+	"time"
 
 	"github.com/fudaoji/go-utils"
 
@@ -34,6 +36,65 @@ type sendFileRes struct {
 	Content string `form:"content" json:"content"`
 	// 文件名称
 	Filename string `form:"filename" json:"filename"`
+}
+
+// 批量发送文本消息请求体
+type sendTextBatchRes struct {
+	// 好友数组
+	Friends []string `form:"friends" json:"friends"`
+	// 群聊数组
+	Groups []string `form:"groups" json:"groups"`
+	// 正文
+	Content string `form:"content" json:"content"`
+}
+
+// SendTextBatchHandle 群发文本消息
+func SendTextBatchHandle(ctx *gin.Context) {
+	// 取出请求参数
+	var res sendTextBatchRes
+	if err := ctx.ShouldBindJSON(&res); err != nil {
+		core.FailWithMessage("参数获取失败", ctx)
+		return
+	}
+
+	bot := GetCurBot(ctx)
+	//好友
+	if len(res.Friends) > 0 {
+		var friends = make(openwechat.Friends, 0)
+		var delays = []time.Duration{}
+		for _, item := range res.Friends {
+			friend, _ := FindFriend(bot, item, ctx)
+			var delay time.Duration
+			if friend != nil {
+				friends = append(friends, friend)
+				rand.Seed(time.Now().UnixNano())
+				delay = time.Duration((rand.Intn(3)+1)*1000) * time.Millisecond
+				delays = append(delays, delay)
+			}
+			if friends.Count() > 0 {
+				friends.SendText(res.Content, delays...)
+			}
+		}
+	}
+	//群聊
+	if len(res.Groups) > 0 {
+		var groups = make(openwechat.Groups, 0)
+		var delays = []time.Duration{}
+		for _, item := range res.Groups {
+			group, _ := FindGroup(bot, item, ctx)
+			var delay time.Duration
+			if group != nil {
+				groups = append(groups, group)
+				rand.Seed(time.Now().UnixNano())
+				delay = time.Duration((rand.Intn(3)+1)*1000) * time.Millisecond
+				delays = append(delays, delay)
+			}
+			if groups.Count() > 0 {
+				groups.SendText(res.Content, delays...)
+			}
+		}
+	}
+	core.Ok(ctx)
 }
 
 // SendVideoToGroup 向指定群聊发视频
