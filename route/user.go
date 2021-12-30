@@ -9,6 +9,8 @@ import (
 // initUserRoute 初始化登录路由信息
 func initUserRoute(app *gin.Engine) {
 	group := app.Group("/user")
+	// 移除多个群成员
+	group.POST("/group/removemembers", controller.RemoveMembersFromGroupHandle)
 	// 获取群成员列表
 	group.POST("/group/members", controller.GetGroupMembersHandle)
 	// 邀请好友入多群

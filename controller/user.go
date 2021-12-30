@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"go-utils"
 	"go-wxbot/core"
 	"go-wxbot/global"
 	"go-wxbot/logger"
@@ -71,6 +72,45 @@ type getGroupMembersRes struct {
 type getGroupMembersResp struct {
 	Total   int                `json:"total"`
 	Members []responseUserInfo `json:"members"` // 群成员
+}
+
+// 邀请好友入群请求体
+type removeMembersFromGroupRes struct {
+	// 群username
+	Group string `form:"group" json:"group"`
+	// 好友username数组
+	Members []string `form:"members" json:"members"`
+}
+
+// RemoveMembersFromGroupHandle 邀请好友入群
+func RemoveMembersFromGroupHandle(ctx *gin.Context) {
+	// 取出请求参数
+	var res removeMembersFromGroupRes
+	if err := ctx.ShouldBindJSON(&res); err != nil {
+		core.FailWithMessage("参数获取失败", ctx)
+		return
+	}
+
+	bot := GetCurBot(ctx)
+	group, self := FindGroup(bot, res.Group, ctx)
+	if group == nil {
+		return
+	}
+
+	var members = make(openwechat.Members, 0)
+	allMembers, _ := group.Members()
+	for _, item := range allMembers {
+		if exists, _ := utils.ContainsStr(res.Members, item.UserName); exists {
+			members = append(members, item)
+		}
+	}
+	if len(members) > 0 {
+		if err := self.RemoveMemberFromGroup(group, members); err != nil {
+			core.FailWithMessage("移除群成员出错：", err.Error())
+			return
+		}
+	}
+	core.Ok(ctx)
 }
 
 // GetGroupMembersHandle 获取群成员
