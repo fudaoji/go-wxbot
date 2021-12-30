@@ -1,11 +1,12 @@
 package controller
 
 import (
-	"go-utils"
 	"go-wxbot/core"
 	"go-wxbot/global"
 	"go-wxbot/logger"
 	"go-wxbot/protocol"
+
+	"github.com/fudaoji/go-utils"
 
 	"github.com/eatmoreapple/openwechat"
 	"github.com/gin-gonic/gin"
@@ -106,7 +107,7 @@ func RemoveMembersFromGroupHandle(ctx *gin.Context) {
 	}
 	if len(members) > 0 {
 		if err := self.RemoveMemberFromGroup(group, members); err != nil {
-			core.FailWithMessage("移除群成员出错：", err.Error())
+			core.FailWithMessage("移除群成员出错："+err.Error(), ctx)
 			return
 		}
 	}
