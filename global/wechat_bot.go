@@ -78,6 +78,16 @@ func UpdateHotLoginData() {
 
 // 更新热登录数据函数
 func dealUpdateHotLoginData() {
+	for _, bot := range wechatBots {
+		user, _ := bot.GetCurrentUser()
+		if err := bot.DumpHotReloadStorage(); err != nil {
+			logger.Log.Errorf("【%v】更新热登录数据失败，错误信息: %v", user.NickName, err)
+		}
+		logger.Log.Infof("【%v】热登录数据更新成功", user.NickName)
+	}
+}
+
+func dealUpdateHotLoginDataBak() {
 	for key, bot := range wechatBots {
 		if bot.Alive() {
 			user, _ := bot.GetCurrentUser()
