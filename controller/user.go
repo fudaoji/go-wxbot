@@ -27,13 +27,13 @@ type responseUserInfo struct {
 
 // 返回的好友列表的实体
 type friendsResponse struct {
-	Count   int                `json:"count"`
+	Total   int                `json:"total"`
 	Friends []responseUserInfo `json:"friends"`
 }
 
 // 返回的群聊列表的实体
 type groupsResponse struct {
-	Count  int                `json:"count"`
+	Total  int                `json:"total"`
 	Groups []responseUserInfo `json:"groups"`
 }
 
@@ -59,6 +59,59 @@ type addFriendIntoGroupsRes struct {
 	Friend string `form:"friend" json:"friend"`
 	// 群组username数值
 	Groups []string `form:"groups" json:"groups"`
+}
+
+// 获取群成员请求体
+type getGroupMembersRes struct {
+	// 群username
+	Group string `form:"group" json:"group"`
+}
+
+// 获取群成员请求体
+type getGroupMembersResp struct {
+	Total   int                `json:"total"`
+	Members []responseUserInfo `json:"members"` // 群成员
+}
+
+// GetGroupMembersHandle 获取群成员
+func GetGroupMembersHandle(ctx *gin.Context) {
+	// 取出请求参数
+	var res getGroupMembersRes
+	if err := ctx.ShouldBindJSON(&res); err != nil {
+		core.FailWithMessage("参数获取失败", ctx)
+		return
+	}
+	bot := GetCurBot(ctx)
+	group, _ := FindGroup(bot, res.Group, ctx)
+	if group == nil {
+		return
+	}
+	// 获取好友列表
+	members, err := group.Members()
+	if err != nil {
+		core.FailWithMessage("获取好友列表失败", ctx)
+		return
+	}
+
+	// 循环处理数据
+	var memberList []responseUserInfo
+	for _, friend := range members {
+		memberList = append(memberList, responseUserInfo{
+			Uin:         friend.Uin,
+			Sex:         friend.Sex,
+			Province:    friend.Province,
+			City:        friend.City,
+			Alias:       friend.Alias,
+			DisplayName: friend.DisplayName,
+			NickName:    friend.NickName,
+			RemarkName:  friend.RemarkName,
+			HeadImgUrl:  friend.HeadImgUrl,
+			UserName:    friend.UserName,
+		})
+	}
+
+	// 返回给前端
+	core.OkWithData(getGroupMembersResp{Total: len(memberList), Members: memberList}, ctx)
 }
 
 // AddFriendsIntoGroupHandle 邀请1个好友入多个群
@@ -205,7 +258,7 @@ func GetFriendsListHandle(ctx *gin.Context) {
 	}
 
 	// 返回给前端
-	core.OkWithData(friendsResponse{Count: friends.Count(), Friends: friendList}, ctx)
+	core.OkWithData(friendsResponse{Total: friends.Count(), Friends: friendList}, ctx)
 }
 
 // GetGroupsListHandle 获取群聊列表
@@ -245,7 +298,7 @@ func GetGroupsListHandle(ctx *gin.Context) {
 	}
 
 	// 返回给前端
-	core.OkWithData(groupsResponse{Count: groups.Count(), Groups: groupList}, ctx)
+	core.OkWithData(groupsResponse{Total: groups.Count(), Groups: groupList}, ctx)
 }
 
 //GetBot 获取当前bot
