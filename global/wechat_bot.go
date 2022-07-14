@@ -3,6 +3,7 @@ package global
 import (
 	"encoding/json"
 	"errors"
+	"go-wxbot/core"
 	. "go-wxbot/db"
 	"go-wxbot/handler"
 	"go-wxbot/logger"
@@ -46,6 +47,9 @@ func CheckBot(appKey string) error {
 func InitWechatBotHandle() *protocol.WechatBot {
 	bot := openwechat.DefaultBot(openwechat.Desktop)
 
+	if core.GetIntVal("app_debug", 1) == 0 {
+		bot.SyncCheckCallback = nil
+	}
 	// 定义读取消息错误回调函数
 	//var getMessageErrorCount int32
 	//bot.GetMessageErrorHandler = func(err error) {

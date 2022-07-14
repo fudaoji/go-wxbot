@@ -8,7 +8,6 @@ import (
 	"github.com/eatmoreapple/openwechat"
 )
 
-// 回调请求体
 type CallbackRes struct {
 	Appkey      string      `json:"appkey"`
 	From        string      `json:"from"`
