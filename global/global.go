@@ -39,7 +39,7 @@ const (
 	MSG_LINK        int32 = 49    // 分享链接消息
 	MSG_TRANSFER    int32 = 2000  //转账消息
 	MSG_RED         int32 = 2001  //红包消息
-	MSG_MINIAPP     int32 = 2002  // 小程序消息
+	MSG_APP         int32 = 2002  // 小程序消息
 	MSG_GROUPINVITE int32 = 2003  //群邀请
 	MSG_RECEIVEFILE int32 = 2004  //接收文件
 	MSG_VERIFY      int32 = 37    // 好友验证
@@ -47,20 +47,14 @@ const (
 	MSG_SYS         int32 = 10000 // 系统消息
 	MSG_RECALLED    int32 = 2005  // 消息撤回
 
-	MSGTYPE_TEXT           string = "text"           // 文本消息
-	MSGTYPE_IMAGE          string = "image"          // 图片消息
-	MSGTYPE_VOICE          string = "voice"          // 语音消息
-	MSGTYPE_VIDEO          string = "video"          // 视频消息
-	MSGTYPE_EMOTICON       string = "emotion"        // 表情消息
-	MSGTYPE_VERIFY         string = "verify"         // 认证消息
-	MSGTYPE_POSSIBLEFRIEND string = "possiblefriend" // 好友推荐
-	MSGTYPE_SHARECARD      string = "sharecard"      // 名片消息
-	MSGTYPE_LOCATION       string = "location"       // 地理位置消息
-	MSGTYPE_APP            string = "app"            // APP消息
-	MSGTYPE_VOIP           string = "voip"           // VOIP消息
-	MSGTYPE_VOIPNOTIFY     string = "voipnotify"     // voip结束消息
-	MSGTYPE_VOIPINVITE     string = "voipinvite"     // VOIP邀请
-	MSGTYPE_MICROVIDEO     string = "microvideo"     // 小视频消息
-	MSGTYPE_SYS            string = "sys"            // 系统消息
-	MSGTYPE_RECALLED       string = "recalled"       // 消息撤回
+	EVENT_PRIVATE_CHAT      string = "EventPrivateChat"
+	EVENT_GROUP_CHAT        string = "EventGroupChat"
+	EVENT_FRIEND_VERIFY     string = "EventFriendVerify"
+	EVENT_GROUP_MEMBER_ADD  string = "EventGroupMemberAdd"
+	EVENT_GROUP_MEMBER_DECR string = "EventGroupMemberDecrease"
+	EVENT_GROUP_NAME_CHANGE string = "EventGroupNameChange"  //群名修改
+	EVENT_INVITEED_IN_GROUP string = "EventInvitedInGroup"   //被邀请入群事
+	EVENT_RECEIVED_TRANSFER string = "EventReceivedTransfer" //收到转账事件（收到好友转账时，运行这里）
+	EVENT_SCAN_CACH_MONEY   string = "EventScanCashMoney"    //面对面收款（二维码收款时，运行这里）
+	EVENT_SYS_MSG           string = "EventSysMsg"           //系统消息事件
 )

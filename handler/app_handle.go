@@ -2,7 +2,8 @@ package handler
 
 import (
 	"encoding/xml"
-	"fmt"
+	"go-wxbot/global"
+	"go-wxbot/logger"
 
 	"github.com/eatmoreapple/openwechat"
 )
@@ -64,10 +65,20 @@ func appMessageHandle(ctx *openwechat.MessageContext) {
 	// 取出发送者
 	sender, _ := ctx.Sender()
 	senderUser := sender.NickName
-	if ctx.IsSendByGroup() {
-		// 取出消息在群里面的发送者
-		senderInGroup, _ := ctx.SenderInGroup()
-		senderUser = fmt.Sprintf("%v[%v]", senderInGroup.NickName, senderUser)
+
+	logger.Log.Infof("[收到小程序消息]\n消息类型: %v\n 发信人：%v\n 内容：%v", ctx.MsgType, senderUser, ctx.Content)
+	msg := ctx.Message
+	bot := ctx.Bot
+	var resp = CallbackRes{Type: global.MSG_APP, MsgId: msg.MsgId, From: sender.UserName, NickName: sender.NickName, Content: msg.Content}
+
+	if !ctx.IsSendBySelf() {
+		if ctx.IsSendByGroup() {
+			// 取出消息在群里面的发送者
+			senderInGroup, _ := ctx.SenderInGroup()
+			resp.Useringroup = senderInGroup.NickName + senderInGroup.UserName
+		}
 	}
+
+	NotifyWebhook(bot, &resp)
 	ctx.Next()
 }

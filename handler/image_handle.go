@@ -2,13 +2,10 @@ package handler
 
 import (
 	"encoding/xml"
+	"go-wxbot/global"
 	"go-wxbot/logger"
 
 	"github.com/eatmoreapple/openwechat"
-)
-
-const (
-	MSGTYPE_IMAGE string = "image"
 )
 
 // ImageMessageData 图片消息结构体
@@ -40,16 +37,23 @@ func imageMessageHandle(ctx *openwechat.MessageContext) {
 	sender, _ := ctx.Sender()
 	senderUser := sender.NickName
 
-	logger.Log.Infof("[收到新文字消息] == 发信人：%v ==> 内容：%v", senderUser, ctx.Content)
+	logger.Log.Infof("[收到图片消息] == 发信人：%v ==> 内容：%v", senderUser, ctx.Content)
 	msg := ctx.Message
 	bot := ctx.Bot
-	var resp = CallbackRes{From: sender.UserName, Type: MSGTYPE_IMAGE, Content: msg.Content}
+	var resp = CallbackRes{Type: global.MSG_IMAGE, MsgId: msg.MsgId, From: sender.UserName, NickName: sender.NickName, Content: msg.Content}
 
 	if !ctx.IsSendBySelf() {
 		if ctx.IsSendByGroup() {
+			resp.Event = global.EVENT_GROUP_CHAT
 			// 取出消息在群里面的发送者
 			senderInGroup, _ := ctx.SenderInGroup()
 			resp.Useringroup = senderInGroup.NickName + senderInGroup.UserName
+			resp.Group = sender.UserName
+			resp.GroupName = sender.NickName
+			resp.From = senderInGroup.UserName
+			resp.NickName = senderInGroup.NickName
+		} else {
+			resp.Event = global.EVENT_PRIVATE_CHAT
 		}
 	}
 

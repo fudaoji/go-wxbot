@@ -3,9 +3,7 @@ package global
 import (
 	"encoding/json"
 	"errors"
-	"go-wxbot/core"
 	. "go-wxbot/db"
-	"go-wxbot/handler"
 	"go-wxbot/logger"
 	"go-wxbot/protocol"
 	"time"
@@ -44,7 +42,7 @@ func CheckBot(appKey string) error {
 }
 
 // InitWechatBotHandle 初始化微信机器人
-func InitWechatBotHandle() *protocol.WechatBot {
+/*func InitWechatBotHandle() *protocol.WechatBot {
 	bot := openwechat.DefaultBot(openwechat.Desktop)
 
 	if core.GetIntVal("app_debug", 1) == 0 {
@@ -66,7 +64,7 @@ func InitWechatBotHandle() *protocol.WechatBot {
 	//bot.MessageOnError()
 	// 返回机器人对象
 	return &protocol.WechatBot{Bot: *bot}
-}
+}*/
 
 // UpdateHotLoginData 更新热登录数据
 func UpdateHotLoginData() {

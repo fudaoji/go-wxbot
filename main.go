@@ -2,6 +2,7 @@ package main
 
 import (
 	"go-wxbot/core"
+	"go-wxbot/handler"
 
 	"github.com/gin-gonic/gin"
 
@@ -16,6 +17,12 @@ import (
 
 // 程序启动入口
 func main() {
+	//读取配置
+	core.InitConfig()
+	if core.GetIntVal("app_debug", 0) == 0 {
+		gin.SetMode(gin.ReleaseMode)
+	}
+
 	// 初始化日志
 	logger.InitLogger()
 	// 初始化Gin
@@ -31,9 +38,6 @@ func main() {
 	// 初始化WechatBotMap
 	global.InitWechatBotsMap()
 
-	//读取配置
-	core.InitConfig()
-
 	// 初始化MysqlDB
 	InitMysqlConnHandle()
 	// 安装数据表
@@ -43,7 +47,7 @@ func main() {
 	InitRedisConnHandle()
 
 	// 初始化Redis里登录的数据
-	global.InitBotWithStart()
+	handler.InitBotWithStart()
 
 	// 定时更新 Bot 的热登录数据
 	global.UpdateHotLoginData()

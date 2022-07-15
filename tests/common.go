@@ -16,17 +16,20 @@ const (
 
 var (
 	Apis = map[string]string{
-		"imgToFriend":         APIHOST + "/message/user/img",
-		"getlogincode":        APIHOST + "/getlogincode",
-		"checklogin":          APIHOST + "/checklogin",
-		"getcurrentuser":      APIHOST + "/user/info",
-		"listfriends":         APIHOST + "/user/friends",
-		"listgroups":          APIHOST + "/user/groups",
-		"msgToFriend":         APIHOST + "/message/user",
-		"msgToGroup":          APIHOST + "/message/group",
+		"sendImg":   APIHOST + "/message/img",
+		"sendText":  APIHOST + "/message/text",
+		"sendVideo": APIHOST + "/message/video",
+		"sendFile":  APIHOST + "/message/file",
+
+		"getlogincode":   APIHOST + "/getlogincode",
+		"checklogin":     APIHOST + "/checklogin",
+		"getcurrentuser": APIHOST + "/user/info",
+		"listfriends":    APIHOST + "/user/friends",
+		"listgroups":     APIHOST + "/user/groups",
+
 		"setfriendremarkname": APIHOST + "/user/setfriendremarkname",
 	}
-	Uuid = "gYmW8lz4zw=="
+	Uuid = "oe1L1aBy3g=="
 )
 
 type Resp struct {

@@ -1,5 +1,19 @@
 package handler
 
+type CallbackRes struct {
+	Appkey      string      `json:"appkey"`
+	Event       string      `json:"event"`
+	Robot       int64       `json:"robot_wxid"`
+	Type        int32       `json:"type"`
+	From        string      `json:"from_wxid"`
+	NickName    string      `json:"from_name"`
+	Content     interface{} `json:"msg"`
+	Useringroup string      `json:"useringroup"`
+	Group       string      `json:"from_group"`
+	GroupName   string      `json:"from_group_name"`
+	MsgId       string      `json:"msgid"`
+}
+
 // 私聊回调请求体
 /**
 * // HTTP(POST)示例
@@ -15,14 +29,14 @@ package handler
 }
 */
 type PrivateChatResp struct {
-	Appkey      string      `json:"appkey"`
-	Event       string      `json:"event"`
-	Robot       string      `json:"robot_wxid"`
-	Type        string      `json:"type"`
-	From        string      `json:"from_wxid"`
-	NickName    string      `json:"from_name"`
-	Content     interface{} `json:"msg"`
-	Useringroup string      `json:"useringroup"`
+	Appkey   string      `json:"appkey"`
+	Event    string      `json:"event"`
+	Robot    string      `json:"robot_wxid"`
+	Type     string      `json:"type"`
+	From     string      `json:"from_wxid"`
+	NickName string      `json:"from_name"`
+	Content  interface{} `json:"msg"`
+	MsgId    string      `json:"msgid"`
 }
 
 // 群聊回调请求体
@@ -52,4 +66,5 @@ type GroupChatResp struct {
 	Useringroup string      `json:"useringroup"`
 	Group       string      `json:"from_group"`
 	GroupName   string      `json:"from_group_name"`
+	MsgId       string      `json:"msgid"`
 }

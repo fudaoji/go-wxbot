@@ -3,6 +3,7 @@ package controller
 import (
 	"go-wxbot/core"
 	"go-wxbot/global"
+	"go-wxbot/handler"
 	"go-wxbot/logger"
 	"go-wxbot/model"
 	"go-wxbot/protocol"
@@ -28,7 +29,7 @@ func GetLoginUrlHandle(ctx *gin.Context) {
 	appKey := ctx.Request.Header.Get("AppKey")
 
 	// 获取一个微信机器人对象
-	bot := global.InitWechatBotHandle()
+	bot := handler.InitWechatBotHandle()
 
 	// 获取登录二维码链接
 	url := "https://login.weixin.qq.com/qrcode/"
@@ -59,7 +60,7 @@ func LoginHandle(ctx *gin.Context) {
 	// 获取Bot对象
 	bot := global.GetBot(appKey)
 	if bot == nil {
-		bot = global.InitWechatBotHandle()
+		bot = handler.InitWechatBotHandle()
 		global.SetBot(appKey, bot)
 	}
 
