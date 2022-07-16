@@ -31,7 +31,7 @@ var (
 		"listfriends":        APIHOST + "/user/friends",
 		"listgroups":         APIHOST + "/user/groups",
 	}
-	Uuid = "oYKiCuaBcg=="
+	Uuid = "wZG4bK80cQ=="
 )
 
 type Resp struct {

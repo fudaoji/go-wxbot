@@ -1,11 +1,16 @@
 package handler
 
 import (
+	"bytes"
 	"encoding/xml"
+	"fmt"
+	"go-wxbot/core"
 	"go-wxbot/global"
 	"go-wxbot/logger"
+	"io/ioutil"
 
 	"github.com/eatmoreapple/openwechat"
+	"github.com/fudaoji/go-utils"
 )
 
 type AppMessageData struct {
@@ -70,15 +75,74 @@ func appMessageHandle(ctx *openwechat.MessageContext) {
 	msg := ctx.Message
 	bot := ctx.Bot
 	var resp = CallbackRes{Type: global.MSG_APP, MsgId: msg.MsgId, From: sender.UserName, NickName: sender.NickName, Content: msg.Content}
+	if ctx.IsComeFromGroup() {
+		resp.Event = global.EVENT_GROUP_CHAT
+		// 取出消息在群里面的发送者
+		senderInGroup, _ := ctx.SenderInGroup()
+		resp.Useringroup = senderInGroup.NickName + senderInGroup.UserName
+		resp.Group = sender.UserName
+		resp.GroupName = sender.NickName
+		resp.From = senderInGroup.UserName
+		resp.NickName = senderInGroup.NickName
+	} else {
+		resp.Event = global.EVENT_PRIVATE_CHAT
+	}
 
-	if !ctx.IsSendBySelf() {
-		if ctx.IsSendByGroup() {
-			// 取出消息在群里面的发送者
-			senderInGroup, _ := ctx.SenderInGroup()
-			resp.Useringroup = senderInGroup.NickName + senderInGroup.UserName
+	// 解析文件
+	var data AppMessageData
+	if err := xml.Unmarshal([]byte(ctx.Content), &data); err != nil {
+		logger.Log.Errorf("消息解析失败: %v", err.Error())
+		logger.Log.Debugf("原始内容: %v", ctx.Content)
+		return
+	} else {
+		tt := data.Appmsg.Type
+		dealType := []string{"2", "3", "4", "6", "15"}
+		if !checkIsExist(dealType, tt) {
+			logger.Log.Infof("奇奇怪怪的未定义处理类型，跳过处理。类型: %v", tt)
+			return
+		}
+		// 下载文件资源
+		fileResp, err := ctx.GetFile()
+		if err != nil {
+			logger.Log.Errorf("文件下载失败: %v", err.Error())
+			return
+		}
+		defer fileResp.Body.Close()
+		imgFileByte, err := ioutil.ReadAll(fileResp.Body)
+		if err != nil {
+			logger.Log.Errorf("文件读取错误: %v", err.Error())
+			return
+		} else {
+			// 读取文件相关信息
+			//contentType := http.DetectContentType(imgFileByte)
+			fileName := fmt.Sprintf("%v_%v", ctx.MsgId, data.Appmsg.Title)
+			path := core.GetVal("uploadpath", "./uploads/")
+			if user, err := ctx.Bot.GetCurrentUser(); err == nil {
+				path = fmt.Sprintf("%v/%v/", path, user.Uin)
+			}
+			// 上传文件(reader2解决上传空文件的BUG,因为http.Response.Body只允许读一次)
+			reader2 := ioutil.NopCloser(bytes.NewReader(imgFileByte))
+
+			_, err := utils.SaveFile(reader2, path, fileName)
+			if err != nil {
+				logger.Log.Errorf("保存文件错误: %v", err.Error())
+				return
+			}
+
+			resp.Content = path + fileName
 		}
 	}
 
 	NotifyWebhook(bot, &resp)
 	ctx.Next()
+}
+
+// 判断数组是否包含某个元素
+func checkIsExist(a []string, k string) bool {
+	for _, item := range a {
+		if item == k {
+			return true
+		}
+	}
+	return false
 }

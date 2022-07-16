@@ -1,11 +1,18 @@
 package handler
 
 import (
+	"bytes"
 	"encoding/xml"
+	"fmt"
+	"go-wxbot/core"
 	"go-wxbot/global"
 	"go-wxbot/logger"
+	"io/ioutil"
+	"net/http"
+	"strings"
 
 	"github.com/eatmoreapple/openwechat"
+	"github.com/fudaoji/go-utils"
 )
 
 // ImageMessageData 图片消息结构体
@@ -57,14 +64,6 @@ func imageMessageHandle(ctx *openwechat.MessageContext) {
 		}
 	}
 
-	NotifyWebhook(bot, &resp)
-	/* sender, _ := ctx.Sender()
-	senderUser := sender.NickName
-	if ctx.IsSendByGroup() {
-		// 取出消息在群里面的发送者
-		senderInGroup, _ := ctx.SenderInGroup()
-		senderUser = fmt.Sprintf("%v[%v]", senderInGroup.NickName, senderUser)
-	}
 	// 解析xml为结构体
 	var data ImageMessageData
 	if strings.HasPrefix(ctx.Content, "@") && !strings.Contains(ctx.Content, " ") {
@@ -75,7 +74,6 @@ func imageMessageHandle(ctx *openwechat.MessageContext) {
 		return
 	}
 
-	logger.Log.Infof("[收到新图片消息] == 发信人：%v", senderUser)
 	// 下载图片资源
 	fileResp, err := ctx.GetFile()
 	if err != nil {
@@ -92,21 +90,22 @@ func imageMessageHandle(ctx *openwechat.MessageContext) {
 		contentType := http.DetectContentType(imgFileByte)
 		fileType := strings.Split(contentType, "/")[1]
 		fileName := fmt.Sprintf("%v.%v", ctx.MsgId, fileType)
+		path := core.GetVal("uploadpath", "./uploads/")
 		if user, err := ctx.Bot.GetCurrentUser(); err == nil {
-			uin := user.Uin
-			fileName = fmt.Sprintf("%v/%v", uin, fileName)
+			path = fmt.Sprintf("%v/%v/", path, user.Uin)
 		}
 
-		// 上传文件
+		// 保存文件
 		reader2 := ioutil.NopCloser(bytes.NewReader(imgFileByte))
-		flag := oss.SaveToOss(reader2, contentType, fileName)
-		if flag {
-			fileUrl := fmt.Sprintf("https://%v/%v/%v", core.OssConfig.Endpoint, core.OssConfig.BucketName, fileName)
-			logger.Log.Infof("图片保存成功，图片链接: %v", fileUrl)
-			ctx.Content = fileUrl
-		} else {
-			logger.Log.Error("图片保存失败")
+		_, err := utils.SaveFile(reader2, path, fileName)
+		if err != nil {
+			logger.Log.Errorf("保存文件错误: %v", err.Error())
+			return
 		}
-	} */
+
+		resp.Content = path + fileName
+	}
+
+	NotifyWebhook(bot, &resp)
 	ctx.Next()
 }

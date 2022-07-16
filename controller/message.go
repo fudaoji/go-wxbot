@@ -7,6 +7,7 @@ import (
 	"go-wxbot/protocol"
 	"os"
 	"path"
+	"strings"
 
 	"github.com/fudaoji/go-utils"
 
@@ -47,20 +48,30 @@ func SendFileHandle(ctx *gin.Context) {
 		return
 	}
 
-	var filename string
-	if len(res.Filename) > 0 {
-		filename = res.Filename
-	} else {
-		filename = path.Base(res.Content)
-	}
+	var file *os.File
+	var err error
+	if strings.Contains(res.Content, "http") {
+		var filename string
+		if len(res.Filename) > 0 {
+			filename = res.Filename
+		} else {
+			filename = path.Base(res.Content)
+		}
 
-	destPath := fmt.Sprintf("%s%d/", core.GetVal("uploadpath", "./uploads/"), self.Uin)
-	file, err := utils.FetchFile(res.Content, destPath, filename)
-	if err != nil {
-		core.FailWithMessage("拉取文件失败"+err.Error(), ctx)
-		return
+		destPath := fmt.Sprintf("%s%d/", core.GetVal("uploadpath", "./uploads/"), self.Uin)
+		file, err = utils.FetchFile(res.Content, destPath, filename)
+		if err != nil {
+			core.FailWithMessage("拉取文件失败"+err.Error(), ctx)
+			return
+		}
+		defer os.Remove(destPath + filename)
+	} else {
+		if file, err = os.Open(res.Content); err != nil {
+			core.FailWithMessage("打开文件失败:"+err.Error(), ctx)
+			return
+		}
+		defer file.Close()
 	}
-	defer os.Remove(destPath + filename)
 
 	// 发送消息
 	if member.IsFriend() {
@@ -99,19 +110,29 @@ func SendVideoHandle(ctx *gin.Context) {
 		return
 	}
 
-	var filename string
-	if len(res.Filename) > 0 {
-		filename = res.Filename
+	var file *os.File
+	var err error
+	if strings.Contains(res.Content, "http") {
+		var filename string
+		if len(res.Filename) > 0 {
+			filename = res.Filename
+		} else {
+			filename = path.Base(res.Content)
+		}
+		destPath := fmt.Sprintf("%s%d/", core.GetVal("uploadpath", "./uploads/"), self.Uin)
+		file, err = utils.FetchFile(res.Content, destPath, filename)
+		if err != nil {
+			core.FailWithMessage("拉取文件失败"+err.Error(), ctx)
+			return
+		}
+		defer os.Remove(destPath + filename)
 	} else {
-		filename = path.Base(res.Content)
+		if file, err = os.Open(res.Content); err != nil {
+			core.FailWithMessage("打开文件失败:"+err.Error(), ctx)
+			return
+		}
+		defer file.Close()
 	}
-	destPath := fmt.Sprintf("%s%d/", core.GetVal("uploadpath", "./uploads/"), self.Uin)
-	file, err := utils.FetchFile(res.Content, destPath, filename)
-	if err != nil {
-		core.FailWithMessage("拉取文件失败"+err.Error(), ctx)
-		return
-	}
-	defer os.Remove(destPath + filename)
 
 	// 发送消息
 	if member.IsFriend() {
@@ -144,24 +165,34 @@ func SendImgHandle(ctx *gin.Context) {
 		return
 	}
 
-	filename := path.Base(res.Content)
-	destPath := fmt.Sprintf("%s%d/", core.GetVal("uploadpath", "./uploads/"), self.Uin)
-	file, err := utils.FetchFile(res.Content, destPath, filename)
-	if err != nil {
-		core.FailWithMessage("拉取图片失败"+err.Error(), ctx)
-		return
+	var file *os.File
+	var err error
+	if strings.Contains(res.Content, "http") {
+		filename := path.Base(res.Content)
+		destPath := fmt.Sprintf("%s%d/", core.GetVal("uploadpath", "./uploads/"), self.Uin)
+		file, err = utils.FetchFile(res.Content, destPath, filename)
+		if err != nil {
+			core.FailWithMessage("拉取图片失败:"+err.Error(), ctx)
+			return
+		}
+		defer os.Remove(destPath + filename)
+	} else {
+		if file, err = os.Open(res.Content); err != nil {
+			core.FailWithMessage("打开图片失败:"+err.Error(), ctx)
+			return
+		}
+		defer file.Close()
 	}
-	defer os.Remove(destPath + filename)
 
 	if member.IsFriend() {
 		if _, err := self.SendImageToFriend(&openwechat.Friend{member}, file); err != nil {
-			core.FailWithMessage("发送图片失败"+err.Error(), ctx)
+			core.FailWithMessage("发送图片失败:"+err.Error(), ctx)
 			return
 		}
 	}
 	if member.IsGroup() {
 		if _, err := self.SendImageToGroup(&openwechat.Group{member}, file); err != nil {
-			core.FailWithMessage("发送图片失败"+err.Error(), ctx)
+			core.FailWithMessage("发送图片失败:"+err.Error(), ctx)
 			return
 		}
 	}

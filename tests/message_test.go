@@ -46,8 +46,9 @@ func TestFile(t *testing.T) {
 //发送图片
 func TestImg(t *testing.T) {
 	method, url := "POST", Apis["sendImg"]
-	img := "https://zyx.images.huihuiba.net/0-5b84f6adbded5.png"
-	username := q53
+	//img := "https://zyx.images.huihuiba.net/0-5b84f6adbded5.png"
+	img := "./uploads/893344204/5139585634270429618.png"
+	username := "@376e7077dc3f984635e9a81331f780f431fee646d92ca27539528e18b21f09df"
 	res := Request(method, url, sendMsg{To: username, Content: img})
 	fmt.Printf("%#v", res)
 }

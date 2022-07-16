@@ -12,7 +12,7 @@ require (
 )
 
 require (
-	github.com/fudaoji/go-utils v0.0.0-20211226150223-9f961efde9a1
+	github.com/fudaoji/go-utils v0.5.1
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/spf13/viper v1.10.1
 	github.com/ugorji/go v1.2.6 // indirect

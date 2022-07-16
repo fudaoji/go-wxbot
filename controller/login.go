@@ -78,7 +78,7 @@ func LoginHandle(ctx *gin.Context) {
 	storage := protocol.NewRedisHotReloadStorage("wechat:login:" + appKey)
 	if err := bot.HotLoginWithUUID(uuid, storage, true); err != nil {
 		logger.Log.Errorf("热登录失败: %v", err)
-		core.FailWithMessage("登录失败："+err.Error(), ctx)
+		core.FailWithMessage("热登录失败："+err.Error(), ctx)
 		return
 	}
 
