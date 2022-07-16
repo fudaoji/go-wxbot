@@ -30,6 +30,13 @@ type mysqlConfig struct {
 	DbName   string // 数据库名称
 }
 
+type SocketConfig struct {
+	Host   string // 主机
+	Port   string // 端口
+	Scheme string // scheme
+	Path   string //
+}
+
 // InitRedisConfig 初始化Redis配置
 func InitMysqlConfig() {
 	// Mysql配置

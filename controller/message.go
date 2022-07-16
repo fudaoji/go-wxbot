@@ -19,15 +19,15 @@ type sendMsgRes struct {
 	// username
 	To string `form:"to" json:"to"`
 	// 正文
-	Content string `form:"content" json:"content"`
+	Content string `form:"msg" json:"msg"`
 }
 
 // 发送文件请求体
 type sendFileRes struct {
 	// username
 	To string `form:"to" json:"to"`
-	// 正文
-	Content string `form:"content" json:"content"`
+	// 文件路径
+	Content string `form:"path" json:"path"`
 	// 文件名称
 	Filename string `form:"filename" json:"filename"`
 }

@@ -21,15 +21,17 @@ var (
 		"sendVideo": APIHOST + "/message/video",
 		"sendFile":  APIHOST + "/message/file",
 
-		"getlogincode":   APIHOST + "/getlogincode",
-		"checklogin":     APIHOST + "/checklogin",
-		"getcurrentuser": APIHOST + "/user/info",
-		"listfriends":    APIHOST + "/user/friends",
-		"listgroups":     APIHOST + "/user/groups",
-
-		"setfriendremarkname": APIHOST + "/user/setfriendremarkname",
+		"removegroupmembers": APIHOST + "/user/group/removemembers",
+		"getgroupmembers":    APIHOST + "/user/group/members",
+		"inviteingroup":      APIHOST + "/user/addfriendsintogroup",
+		"setremarkname":      APIHOST + "/user/setremarkname",
+		"getlogincode":       APIHOST + "/getlogincode",
+		"checklogin":         APIHOST + "/checklogin",
+		"getcurrentuser":     APIHOST + "/user/info",
+		"listfriends":        APIHOST + "/user/friends",
+		"listgroups":         APIHOST + "/user/groups",
 	}
-	Uuid = "oe1L1aBy3g=="
+	Uuid = "oYKiCuaBcg=="
 )
 
 type Resp struct {

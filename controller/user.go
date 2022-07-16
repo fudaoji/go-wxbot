@@ -75,7 +75,7 @@ type getGroupMembersResp struct {
 	Members []responseUserInfo `json:"members"` // 群成员
 }
 
-// 邀请好友入群请求体
+// 移出群请求体
 type removeMembersFromGroupRes struct {
 	// 群username
 	Group string `form:"group" json:"group"`
@@ -83,7 +83,7 @@ type removeMembersFromGroupRes struct {
 	Members []string `form:"members" json:"members"`
 }
 
-// RemoveMembersFromGroupHandle 邀请好友入群
+// RemoveMembersFromGroupHandle 将好友移除群
 func RemoveMembersFromGroupHandle(ctx *gin.Context) {
 	// 取出请求参数
 	var res removeMembersFromGroupRes
@@ -210,7 +210,7 @@ func AddFriendsIntoGroupHandle(ctx *gin.Context) {
 }
 
 // SetRemarkNameHandle 修改指定用户的备注
-func SetFriendRemarkNameHandle(ctx *gin.Context) {
+func SetRemarkNameHandle(ctx *gin.Context) {
 	// 取出请求参数
 	var res setRemarkNameRes
 	if err := ctx.ShouldBindJSON(&res); err != nil {

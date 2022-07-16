@@ -7,6 +7,11 @@ import (
 	"github.com/eatmoreapple/openwechat"
 )
 
+//checkIsFriendAdd 判断是否系统消息
+func checkIsVideo(message *openwechat.Message) bool {
+	return message.IsVideo()
+}
+
 // 处理语音消息
 func videoMessageHandle(ctx *openwechat.MessageContext) {
 	sender, _ := ctx.Sender()

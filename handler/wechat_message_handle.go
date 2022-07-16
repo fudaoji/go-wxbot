@@ -84,10 +84,16 @@ func HandleMessage(bot *openwechat.Bot) {
 	dispatcher.OnImage(imageMessageHandle)
 	// 注册语音消息处理函数
 	dispatcher.OnVoice(voiceMessageHandle)
+	// 视频消息
+	dispatcher.RegisterHandler(checkIsVideo, videoMessageHandle)
 	// 注册表情包消息处理器
 	dispatcher.OnEmoticon(emoticonMessageHandle)
 	// APP消息处理
 	dispatcher.OnMedia(appMessageHandle)
+	// 好友请求
+	dispatcher.RegisterHandler(checkIsFriendAdd, friendAddMessageHandle)
+	// 系统消息
+	dispatcher.RegisterHandler(checkIsSystem, sysMessageHandle)
 	// 保存消息
 	//dispatcher.RegisterHandler(checkNeedSave, saveToDb)
 

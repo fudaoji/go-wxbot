@@ -15,6 +15,7 @@ func initUserRoute(app *gin.Engine) {
 	group.POST("/group/members", controller.GetGroupMembersHandle)
 	// 邀请好友入多群
 	group.POST("/addfriendintogroups", controller.AddFriendIntoGroupsHandle)
+
 	// 邀请多个好友入群
 	group.POST("/addfriendsintogroup", controller.AddFriendsIntoGroupHandle)
 	// 获取登录的用户信息
@@ -24,5 +25,5 @@ func initUserRoute(app *gin.Engine) {
 	// 获取群组列表
 	group.GET("/groups", controller.GetGroupsListHandle)
 	// 修改好友备注
-	group.POST("/setfriendremarkname", controller.SetFriendRemarkNameHandle)
+	group.POST("/setremarkname", controller.SetRemarkNameHandle)
 }

@@ -16,24 +16,22 @@ func textMessageHandle(ctx *openwechat.MessageContext) {
 	sender, _ := ctx.Sender()
 	senderUser := sender.NickName
 
-	logger.Log.Infof("[收到新文字消息] == 发信人：%v ==> 内容：%v", senderUser, ctx.Content)
+	logger.Log.Infof("[收到新文字消息]\n 发信人：%v\n内容：%v\nmsgid:%v", senderUser, ctx.Content, ctx.MsgId)
 	msg := ctx.Message
 	bot := ctx.Bot
 	var resp = CallbackRes{Type: global.MSG_TEXT, MsgId: msg.MsgId, From: sender.UserName, NickName: sender.NickName, Content: msg.Content}
 
-	if !ctx.IsSendBySelf() {
-		if ctx.IsSendByGroup() {
-			resp.Event = global.EVENT_GROUP_CHAT
-			// 取出消息在群里面的发送者
-			senderInGroup, _ := ctx.SenderInGroup()
-			resp.Useringroup = senderInGroup.NickName + senderInGroup.UserName
-			resp.Group = sender.UserName
-			resp.GroupName = sender.NickName
-			resp.From = senderInGroup.UserName
-			resp.NickName = senderInGroup.NickName
-		} else {
-			resp.Event = global.EVENT_PRIVATE_CHAT
-		}
+	if msg.IsComeFromGroup() {
+		resp.Event = global.EVENT_GROUP_CHAT
+		// 取出消息在群里面的发送者
+		senderInGroup, _ := ctx.SenderInGroup()
+		resp.Useringroup = senderInGroup.NickName + senderInGroup.UserName
+		resp.Group = sender.UserName
+		resp.GroupName = sender.NickName
+		resp.From = senderInGroup.UserName
+		resp.NickName = senderInGroup.NickName
+	} else {
+		resp.Event = global.EVENT_PRIVATE_CHAT
 	}
 
 	NotifyWebhook(bot, &resp)
